@@ -15,34 +15,20 @@ import networkx as nx
 G = nx.Graph()
 for i in range(height):
      for j in range(width):
-            #G.add_nodes_from([(str(i)+'_'+str(j), {"greylevel": blank_image[i,j]})])
             G.add_nodes_from([((i,j), {"greylevel": blank_image[i,j]})])
-            print(i,' ',j)
-
+            
 for i in range (height-1):
     for j in range(width-1):
       if(blank_image[i,j]!= 255 and blank_image[i,j+1]!=255):
-            print(str(i)+'_'+str(j),blank_image[i,j],'--',
-                  str(i)+'_'+str(j+1),blank_image[i,j+1])
-            #G.add_edge(str(i)+"_"+str(j),str(i)+"_"+str(j+1))
             G.add_edge((i,j),(i,j+1))
       if(blank_image[i,j]!= 255 and blank_image[i+1,j]!=255):
-            print(str(i)+'_'+str(j),blank_image[i,j],'--',
-                  str(i+1)+'_'+str(j),blank_image[i+1,j])
-            #G.add_edge(str(i)+"_"+str(j),str(i+1)+"_"+str(j))
             G.add_edge((i,j),(i+1,j))
       if(blank_image[i,j]!= 255 and blank_image[i+1,j+1]!=255):      
-            print(str(i)+'_'+str(j),blank_image[i,j],'--',
-                  str(i+1)+'_'+str(j+1),blank_image[i+1,j+1])
-            #G.add_edge(str(i)+"_"+str(j),str(i+1)+"_"+str(j+1))
             G.add_edge((i,j),(i+1,j+1))
 
 i=height-1
 for j in range(width-1):
        if(blank_image[i,j]!= 255 and blank_image[i,j+1]!=255):    
-            print(str(i)+'_'+str(j),blank_image[i,j],'--',
-                  str(i)+'_'+str(j+1),blank_image[i,j+1])
-            #G.add_edge(str(i)+"_"+str(j),str(i)+"_"+str(j+1))
             G.add_edge((i,j),(i,j+1))
 
 print(G.number_of_nodes())
