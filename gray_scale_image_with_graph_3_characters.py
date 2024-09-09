@@ -1,16 +1,21 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-grey_level=255
-height,width=200,250
-blank_image=grey_level* np.ones((height,width),dtype=np.uint8)
-font = cv2.FONT_HERSHEY_SIMPLEX
-org = (50,100)
-fontScale = 3
-color = (0)
-thickness = 5
-image = cv2.putText(blank_image, 'a b', org, font, 
-                   fontScale, color, thickness, cv2.LINE_AA)
+
+def generate_text_image(height,width,text):
+    grey_level=255
+    # height,width=200,250
+    blank_image=grey_level* np.ones((height,width),dtype=np.uint8)
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    org = (50,100)
+    fontScale = 3
+    color = (0)
+    thickness = 5
+    # image = cv2.putText(blank_image, 'a b', org, font, 
+    #                 fontScale, color, thickness, cv2.LINE_AA)
+    image = cv2.putText(blank_image, text, org, font, 
+                    fontScale, color, thickness, cv2.LINE_AA)
+    return image
 
 # cv2.imshow('Image',blank_image)
 # cv2.waitKey(0)
@@ -26,9 +31,9 @@ image = cv2.putText(blank_image, 'a b', org, font,
 
 
 import networkx as nx
-
-
-
+height,width=200,250
+text='a b'
+image=generate_text_image(height,width,text)
 
 G = nx.Graph()
 def distance(edge):
