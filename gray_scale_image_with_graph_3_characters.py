@@ -16,70 +16,89 @@ def generate_text_image(height,width,text):
     return image
 
 import networkx as nx
+
 height,width=200,250
 text='a b'
 image=generate_text_image(height,width,text)
 
-G = nx.Graph()
 def distance(edge):
-    return G.edges[edge[0],edge[1]]['distance']
+            return G.edges[edge[0],edge[1]]['distance']
+
+def generate_graph_from_image(image):
+
+    height,width=np.shape(image)
+    G = nx.Graph()
+    for i in range(height):
+        for j in range(width):
+                G.add_nodes_from([((i,j), {"greylevel": image[i,j]})])
 
 
-for i in range(height):
-     for j in range(width):
-            G.add_nodes_from([((i,j), {"greylevel": image[i,j]})])
+    for i in range (height-1):
+        for j in range(1,width-1):
+            G.add_edge((i,j),(i,j+1),distance=abs(np.subtract(image[i,j],image[i,j+1])))
+            G.add_edge((i,j),(i+1,j),distance=abs(np.subtract(image[i,j],image[i+1,j])))
+            G.add_edge((i,j),(i+1,j+1),distance=abs(np.subtract(image[i,j],image[i+1,j+1])))
+            G.add_edge((i,j),(i+1,j-1),distance=abs(np.subtract(image[i,j],image[i+1,j-1])))
 
 
-for i in range (height-1):
-    for j in range(1,width-1):
-        G.add_edge((i,j),(i,j+1),distance=abs(np.subtract(image[i,j],image[i,j+1])))
-        G.add_edge((i,j),(i+1,j),distance=abs(np.subtract(image[i,j],image[i+1,j])))
-        G.add_edge((i,j),(i+1,j+1),distance=abs(np.subtract(image[i,j],image[i+1,j+1])))
-        G.add_edge((i,j),(i+1,j-1),distance=abs(np.subtract(image[i,j],image[i+1,j-1])))
+    print(G.number_of_nodes())
+    print(G.number_of_edges())
 
+    return G
 
-print(G.number_of_nodes())
-print(G.number_of_edges())
-
+G=generate_graph_from_image(image)
 
 number_connected_components=nx.number_connected_components(G)
 print(number_connected_components)
+
+
+
+def remove_edges(G,threshold):
+
+    for edge in G.edges:
+        if(distance(edge)> threshold):
+            G.remove_edge(edge[0],edge[1])
+    print('After edge removal')
+    return G
+
+number_connected_components=nx.number_connected_components(G)
+print(number_connected_components)
+def generate_image_connected_components(G):
+    connected=[c for c in sorted(nx.connected_components(G), key=len, reverse=True)]
+
+    # for i in range(100):
+    #     print('Connected ', i, ':', len(connected[i]))
+
+    image_BGR = np.zeros((height,width,3), np.uint8)
+    for node in connected[0]:
+        image_BGR[node[0],node[1]]=(255,255,255)
+
+    for node in connected[1]:
+        image_BGR[node[0],node[1]]=(255,000,0)
+
+
+    for node in connected[2]:
+        image_BGR[node[0],node[1]]=(0,0,255)
+
+    for node in connected[3]:
+        image_BGR[node[0],node[1]]=(0,255,0)
+
+    for node in connected[4]:
+        image_BGR[node[0],node[1]]=(0,255,255)
+
+    return image_BGR
+
 threshold=0
-for edge in G.edges:
-     if(distance(edge)> threshold):
-          G.remove_edge(edge[0],edge[1])
-print('After edge removal')
+G=remove_edges(G,threshold)
 
-number_connected_components=nx.number_connected_components(G)
-print(number_connected_components)
+image_BGR=generate_image_connected_components(G)
 
-connected=[c for c in sorted(nx.connected_components(G), key=len, reverse=True)]
-
-for i in range(100):
-     print('Connected ', i, ':', len(connected[i]))
-
-blank_image_BGR = np.zeros((height,width,3), np.uint8)
-for node in connected[0]:
-    blank_image_BGR[node[0],node[1]]=(255,255,255)
-
-for node in connected[1]:
-    blank_image_BGR[node[0],node[1]]=(255,000,0)
-
-
-for node in connected[2]:
-    blank_image_BGR[node[0],node[1]]=(0,0,255)
-
-for node in connected[3]:
-    blank_image_BGR[node[0],node[1]]=(0,255,0)
-
-for node in connected[4]:
-    blank_image_BGR[node[0],node[1]]=(0,255,255)
-
-
-cv2.imshow('Color Image',blank_image_BGR)
+cv2.imshow('Color Image',image_BGR)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
+
+connected=[c for c in sorted(nx.connected_components(G), key=len, reverse=True)]
 rows=set()
 colummns=set()
 for node in connected[1]:
@@ -105,7 +124,7 @@ def roi(image,x1,y1,x2,y2): #x1 row_origin, y1 col origin, x2 row dest,y2,col de
 
     return image
 
-image_roi= roi(blank_image_BGR,x1,y1,x2,y2)
+image_roi= roi(image_BGR,x1,y1,x2,y2)
 
 cv2.imshow('Image with Roi',image_roi)
 cv2.waitKey(0)
