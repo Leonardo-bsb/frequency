@@ -98,23 +98,24 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 
 
-connected=[c for c in sorted(nx.connected_components(G), key=len, reverse=True)]
-rows=set()
-colummns=set()
-for node in connected[1]:
-    rows.add(node[0])
-    colummns.add(node[1])
-y1=min(rows)
-print("min row: ", y1)
-y2=max(rows)
-print("max row: ", y2)
-x1=min(colummns)
-print("min col: ", x1)
-x2=max(colummns)
-print("max col: ", x2)
 
 
-def roi(image,x1,y1,x2,y2): #x1 row_origin, y1 col origin, x2 row dest,y2,col dest
+
+def roi(image,component): #x1 row_origin, y1 col origin, x2 row dest,y2,col dest
+    connected=[c for c in sorted(nx.connected_components(G), key=len, reverse=True)]
+    rows=set()
+    colummns=set()
+    for node in connected[component]:
+        rows.add(node[0])
+        colummns.add(node[1])
+    y1=min(rows)
+    # print("min row: ", y1)
+    y2=max(rows)
+    # print("max row: ", y2)
+    x1=min(colummns)
+    # print("min col: ", x1)
+    x2=max(colummns)
+    # print("max col: ", x2)
     for i in range(y1,y2): 
         image[i,x1]=(0,0,255) #first col
         image[i,x2]=(0,0,255) #last col
@@ -124,7 +125,7 @@ def roi(image,x1,y1,x2,y2): #x1 row_origin, y1 col origin, x2 row dest,y2,col de
 
     return image
 
-image_roi= roi(image_BGR,x1,y1,x2,y2)
+image_roi= roi(image_BGR,1)
 
 cv2.imshow('Image with Roi',image_roi)
 cv2.waitKey(0)
@@ -164,7 +165,7 @@ def generate_object_graph(image,nodes):
     return vertices
     
 
-
+connected=[c for c in sorted(nx.connected_components(G), key=len, reverse=True)]
 vertices=generate_object_graph(image,connected[1])
 print(vertices)
 import pandas as pd
